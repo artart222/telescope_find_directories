@@ -5,10 +5,9 @@ local sorters = require('telescope.sorters')
 local state = require('telescope.actions.state')
 local conf = require("telescope.config").values
 
+local M = {}
 
-return require('telescope').register_extension {
-  exports = {
-    all = function ()
+function M.find_directories()
     pickers.new {
       prompt_title = "Find Directories",
       finder = finders.new_oneshot_job { "fd", "--type=d", "--hidden", "--follow"},
@@ -24,6 +23,10 @@ return require('telescope').register_extension {
       return true
     end
     }:find()
-    end
+end
+
+return require('telescope').register_extension {
+  exports = {
+      find_directories = M.find_directories
   }
 }
