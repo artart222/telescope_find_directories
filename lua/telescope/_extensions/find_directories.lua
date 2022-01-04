@@ -7,10 +7,22 @@ local conf = require("telescope.config").values
 
 local M = {}
 
+local os = vim.loop.os_uname().sysname
+if os == "Linux" then
+  -- Find the name of the fd binary file in the operating system.
+  if vim.fn.filereadable("/bin/fdfind") == 1 then
+    finder = "fdfind"
+  else
+    finder = "fd"
+  end
+else
+    finder = "fd"
+end
+
 function M.find_directories()
     pickers.new {
       prompt_title = "Find Directories",
-      finder = finders.new_oneshot_job { "fd", "--type=d", "--hidden", "--follow"},
+      finder = finders.new_oneshot_job { finder, "--type=d", "--hidden", "--follow", "--exclude=.git"},
       sorter = conf.generic_sorter(),
       attach_mappings = function(prompt_bufnr, map)
         actions.select_default:replace(function()
