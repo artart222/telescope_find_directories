@@ -22,7 +22,7 @@ end
 function M.find_directories()
     pickers.new {
       prompt_title = "Find Directories",
-      finder = finders.new_oneshot_job { finder, "--type=d", "--hidden", "--follow", "--exclude=.git", "--strip-cwd-prefix" },
+      finder = finders.new_oneshot_job { finder, "--type=d", "--hidden", "--follow", "--exclude=.git" },
       sorter = conf.generic_sorter(),
       attach_mappings = function(prompt_bufnr, map)
         actions.select_default:replace(function()
