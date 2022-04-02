@@ -30,7 +30,7 @@ function M.find_directories()
         actions.close(prompt_bufnr)
         local selection = state.get_selected_entry(prompt_bufnr)
         vim.cmd("cd " .. selection[1])
-        vim.cmd("ene | startinsert")
+        vim.cmd("ene")
         vim.cmd("NvimTreeOpen")
       end)
       return true
