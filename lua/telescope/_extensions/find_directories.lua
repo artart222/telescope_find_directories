@@ -7,6 +7,44 @@ local conf = require("telescope.config").values
 
 local M = {}
 
+-- Extension options from telescope.setup({ extensions = { find_directories = {...} } })
+-- open_explorer: nil = auto-detect, false = disable, string command, or function()
+local config = {
+  open_explorer = nil,
+}
+
+local function command_exists(cmd)
+  return vim.fn.exists(":" .. cmd) == 2
+end
+
+--- Open a file explorer after selecting a directory.
+--- Honors config.open_explorer override; otherwise tries neo-tree, nvim-tree, then oil.
+local function open_file_explorer()
+  local override = config.open_explorer
+
+  if override == false then
+    return
+  end
+
+  if type(override) == "function" then
+    override()
+    return
+  end
+
+  if type(override) == "string" then
+    vim.cmd(override)
+    return
+  end
+
+  if command_exists("Neotree") then
+    vim.cmd("Neotree reveal")
+  elseif command_exists("NvimTreeOpen") then
+    vim.cmd("NvimTreeOpen")
+  elseif command_exists("Oil") then
+    vim.cmd("Oil")
+  end
+end
+
 local os = vim.loop.os_uname().sysname
 local finder
 if os == "Linux" then
@@ -31,7 +69,7 @@ function M.find_directories()
         local selection = state.get_selected_entry(prompt_bufnr)
         vim.cmd("cd " .. selection[1])
         vim.cmd("ene")
-        vim.cmd("NvimTreeOpen")
+        open_file_explorer()
       end)
       return true
     end,
@@ -39,6 +77,11 @@ function M.find_directories()
 end
 
 return require("telescope").register_extension({
+  setup = function(ext_config, _)
+    if ext_config.open_explorer ~= nil then
+      config.open_explorer = ext_config.open_explorer
+    end
+  end,
   exports = {
     find_directories = M.find_directories,
   },
